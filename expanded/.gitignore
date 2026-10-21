@@ -1,0 +1,5 @@
+ImagePipeline/input/
+ImagePipeline/output/
+__pycache__/
+*.pyc
+

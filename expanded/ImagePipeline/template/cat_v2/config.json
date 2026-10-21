@@ -1,0 +1,17 @@
+{
+  "marker_layout": [
+    1,
+    2,
+    3,
+    0
+  ],
+  "crop_rect": [
+    220,
+    150,
+    1380,
+    850
+  ],
+  "template_version": 2,
+  "species": "cat",
+  "source_faces_right": true
+}
