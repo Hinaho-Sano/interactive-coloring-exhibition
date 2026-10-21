@@ -16,6 +16,18 @@ Azure KinectとUnityでつくる、物語の台地にいる動物へ手を伸ば
 
 特殊行動用の画像がまだない動物は、通常画像へ自動的にフォールバックします。新しい動物は `AnimalCatalog` のプロフィールと `Assets/Resources/Magic/` の画像を追加するだけで接続できます。
 
+## 独立した春の環境プロトタイプ
+
+動物の当たり判定と混ざらないよう、環境インタラクションは `Assets/SpringEnvironment.unity` に分離しています。Unity上部メニューの **Resonance → Open Environment Scene** で環境版だけを開き、Playしてください。**Open Animal Scene** を選べば従来の塗り絵動物版へ戻れます。
+
+- 左上の木へ手を伸ばすと、木漏れ日が揺れて葉が落ちる
+- 右下の川をなぞると、流れ・波紋・水しぶきが強くなる
+- 上部の空へ手を伸ばすと、手の位置を中心に虹が現れる
+- 手前のタンポポへ近づくと、綿毛が風に乗って舞う
+- Kinectでは2つの手が別々の自然へ同時に作用できる
+
+マウス確認では左ボタンを押しながら各場所をなぞります。`R` ですべての環境反応をリセット、`F1` でマウス／Kinectとシルエット表示を切り替えます。環境版と動物版は同時起動せず、各メニューを選ぶとBuild Settingsもそのシーン1件へ切り替わるため、別々のアプリとしてビルドできます。
+
 ![展示の背景](Assets/Resources/Magic/Library.png)
 
 ## 体験
@@ -31,7 +43,7 @@ Azure KinectとUnityでつくる、物語の台地にいる動物へ手を伸ば
 このリポジトリは、フォルダー構造を保った **EnchantedSilhouetteLibrary-UnityProject.zip** と導入手順を公開しています。
 ZIPをダウンロードして展開してください。Unityプロジェクトのルートは展開後の `UnityProject` です。
 
-1. Windows x64、Unity **6000.6.4f1**、Azure Kinect DK、USB 3.0と別系統の電源を用意します。Meta Questは使いません。
+1. Windows x64、Unity **6000.6.3f1**、Azure Kinect DK、USB 3.0と別系統の電源を用意します。Meta Questは使いません。
 2. [Microsoft公式のAzure Kinect Sensor SDK](https://github.com/microsoft/Azure-Kinect-Sensor-SDK/releases/tag/v1.4.2)をインストールします。
 3. Unityを開く前に、展開フォルダーの `Setup-Dependencies.ps1` をPowerShellで実行します。
 
@@ -54,6 +66,8 @@ ZIPをダウンロードして展開してください。Unityプロジェクト
 | F1 | 背景登録、距離、音量、マウス確認モード |
 | R | 動物を元の場所へ戻してリセット |
 
+環境シーンでは同じ `F1` と `R` を使い、左ドラッグで自然へ触れます。
+
 このPCでは `C:\Users\Hinaho\My project\ImagePipeline\output` も自動検出します。別の場所を使う場合は、ビルドしたアプリの起動時に `-coloringOutput="出力フォルダー"` を追加するか、環境変数 `COLORING_OUTPUT_DIR` を設定してください。停止中は読み込んだ子供の塗り絵を表示し、移動中はその配色を反映した4コマ歩行画像へ切り替えます。
 
 Playを停止すると背景登録は失われます。家具が影になる場合は、空の背景を登録し直してください。
@@ -67,6 +81,9 @@ Playを停止すると背景登録は失われます。家具が影になる場�
 - `Assets/Scripts/AnimalCompanions.cs`: 動物の経路追従・帰還
 - `Assets/Scripts/ExhibitionController.cs`: 展示表示・アニメーション・設定
 - `Assets/Scripts/ColoringImportBridge.cs`: 写真処理済みPNGの監視・自動読込
+- `Assets/Scripts/SpringEnvironmentWorld.cs`: 木・川・虹・タンポポの反応と粒子状態
+- `Assets/Scripts/SpringEnvironmentController.cs`: 独立した環境シーンのKinect／マウス入力と描画
+- `Assets/SpringEnvironment.unity`: 環境インタラクション専用シーン
 - `Assets/Resources/Magic/`: 背景と動物の素材
 - `COLORING_RIG_SPEC.md`: 塗り絵をそのまま動かす2Dリグの設計
 - `ART_PROMPTS.txt`: 内蔵imagegenで作成した素材の生成プロンプト
@@ -79,7 +96,7 @@ UnityのLibrary/Temp/Logs、ユーザー設定、認証情報、カメラ映像�
 
 ## 確認状況と制限
 
-C#コンパイルと経路追従・帰還・接触判定などの29項目を検証済みです。
+純C#の状態モデル・経路追従・接触判定・環境4反応など17項目を `expanded/CoreTests` で検証しています。
 実機での手の認識は照明、距離、設置位置に依存します。動物の動きは4コマの2Dスプライトです。
 依存ファイルの取得スクリプトは、公開環境での全件新規ダウンロードをまだ検証していません。
 公開だけで任意の再利用ライセンスを付与するものではありません。第三者の素材・ソフトウェアにはそれぞれの条件が適用されます。

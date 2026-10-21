@@ -3,7 +3,7 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 
-public sealed class ExhibitionController : MonoBehaviour
+public sealed class ExhibitionController : MonoBehaviour,IExhibitionInputTarget
 {
     public bool mousePractice=true,showSilhouette=true;
     public float controlSpan=.65f,soundLevel=.16f;
@@ -31,12 +31,7 @@ public sealed class ExhibitionController : MonoBehaviour
     string status="Kinect starting...";
     bool settings,mouseDown,capturing; float captureAt,lastMask=-100,mouseTeaseUntil=-100;
     Vector2 mouse; Rect viewport;
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Bootstrap()
-    {
-        if(FindAnyObjectByType<ExhibitionController>()!=null)return;
-        var go=new GameObject("The waking library");go.AddComponent<ExhibitionController>();go.AddComponent<ExhibitionKinectInput>();
-    }
+    bool IExhibitionInputTarget.MousePractice { get=>mousePractice; set=>mousePractice=value; }
     void Awake()
     {
         Application.runInBackground=true;Application.targetFrameRate=60;

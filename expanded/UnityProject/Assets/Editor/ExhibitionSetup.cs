@@ -2,11 +2,10 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-[InitializeOnLoad]
 public static class ExhibitionSetup
 {
-    static ExhibitionSetup() { EditorApplication.delayCall+=Prepare; }
     [MenuItem("Resonance/Open Exhibition Scene")]
+    [MenuItem("Resonance/Open Animal Scene")]
     public static void Prepare()
     {
         if(EditorApplication.isPlayingOrWillChangePlaymode) return;
@@ -21,8 +20,32 @@ public static class ExhibitionSetup
         }
         else if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().path!=scenePath)
             EditorSceneManager.OpenScene(scenePath,OpenSceneMode.Single);
-        EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene(scenePath,true)};
         PlayerSettings.productName="ResonanceExhibition";
+        ConfigureBuild(scenePath);
+    }
+
+    [MenuItem("Resonance/Open Environment Scene")]
+    public static void PrepareEnvironment()
+    {
+        if(EditorApplication.isPlayingOrWillChangePlaymode) return;
+        const string scenePath="Assets/SpringEnvironment.unity";
+        if(!System.IO.File.Exists(scenePath))
+        {
+            var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+            var view=new GameObject("Environment Camera").AddComponent<Camera>();view.tag="MainCamera";
+            var root=new GameObject("Spring Environment / Azure Kinect");
+            root.AddComponent<SpringEnvironmentController>();root.AddComponent<ExhibitionKinectInput>();
+            EditorSceneManager.SaveScene(scene,scenePath);
+        }
+        else if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().path!=scenePath)
+            EditorSceneManager.OpenScene(scenePath,OpenSceneMode.Single);
+        PlayerSettings.productName="SpringEnvironmentExhibition";
+        ConfigureBuild(scenePath);
+    }
+
+    static void ConfigureBuild(string scenePath)
+    {
+        EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene(scenePath,true)};
         PlayerSettings.fullScreenMode=FullScreenMode.FullScreenWindow;
         PlayerSettings.defaultScreenWidth=1920; PlayerSettings.defaultScreenHeight=1080;
         var settings=AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset");

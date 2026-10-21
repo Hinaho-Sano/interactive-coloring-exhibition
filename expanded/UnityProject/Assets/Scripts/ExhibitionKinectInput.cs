@@ -27,9 +27,10 @@ public sealed class ExhibitionKinectInput : MonoBehaviour
     readonly object gate=new object();
     Snapshot pending;
     string error,progress;
-    ExhibitionController game;
+    IExhibitionInputTarget target;
     MediaPipeGunPose handPose;
     Device activeDevice;
+    bool attemptedStart;
 
     [DllImport("k4a", CallingConvention=CallingConvention.Cdecl)]
     static extern int k4a_set_debug_message_handler(IntPtr callback,IntPtr context,LogLevel level);
@@ -38,12 +39,22 @@ public sealed class ExhibitionKinectInput : MonoBehaviour
     {
         if(worker!=null&&worker.IsAlive) return;
         stopping=false;
-        game=GetComponent<ExhibitionController>();
+        attemptedStart=false;
+        foreach(var behaviour in GetComponents<MonoBehaviour>())
+            if(behaviour is IExhibitionInputTarget inputTarget){target=inputTarget;break;}
+        if(target==null){Debug.LogError("No exhibition input target is attached.");enabled=false;return;}
         handPose=GetComponent<MediaPipeGunPose>();
         if(handPose==null) handPose=gameObject.AddComponent<MediaPipeGunPose>();
-        if(startInMousePractice) { game.mousePractice=true; game.SetStatus("Mouse practice"); return; }
-        game.mousePractice=false;
-        game.SetStatus("Azure Kinect starting...");
+        if(startInMousePractice) target.MousePractice=true;
+        target.SetStatus(target.MousePractice?"Mouse practice / Kinect standby":"Azure Kinect starting...");
+        if(!target.MousePractice) StartWorker();
+    }
+    void StartWorker()
+    {
+        if(attemptedStart||(worker!=null&&worker.IsAlive)) return;
+        attemptedStart=true;
+        stopping=false;
+        target.SetStatus("Azure Kinect starting...");
         worker=new Thread(Run){IsBackground=true,Name="Azure Kinect Color Capture"};
         worker.Start();
     }
@@ -107,20 +118,21 @@ public sealed class ExhibitionKinectInput : MonoBehaviour
     }
     void Update()
     {
+        if(target!=null&&!target.MousePractice&&!attemptedStart) StartWorker();
         Snapshot s; string e,p;
         lock(gate) { s=pending; pending=null; e=error; error=null; p=progress; progress=null; }
-        if(p!=null) game.SetStatus(p);
+        if(p!=null) target.SetStatus(p);
         if(s!=null)
         {
             GunInput left=default,right=default;
-            if(!game.mousePractice)
+            if(!target.MousePractice)
             {
                 handPose.ReadPair(s.Pixels,s.Width,s.Height,s.Timestamp,out left,out right);
-                game.SetStatus(handPose.Status);
+                target.SetStatus(handPose.Status);
             }
-            game.SetFrame(s.Pixels,s.Width,s.Height,left,right,s.Mask);
+            target.SetFrame(s.Pixels,s.Width,s.Height,left,right,s.Mask);
         }
-        if(e!=null) { game.SetStatus("Kinect error: "+e); Debug.LogError(e); }
+        if(e!=null) { target.SetStatus("Kinect error: "+e); Debug.LogError(e); }
     }
     void OnDisable()
     {
@@ -129,6 +141,8 @@ public sealed class ExhibitionKinectInput : MonoBehaviour
         lock(gate) device=activeDevice;
         try { device?.StopCameras(); } catch(ObjectDisposedException) { }
         if(worker!=null&&!worker.Join(5000)) Debug.LogWarning("Kinect capture is still shutting down. Restart Unity before updating scripts.");
+        worker=null;
+        attemptedStart=false;
         lock(gate) pending=null;
     }
 #endif

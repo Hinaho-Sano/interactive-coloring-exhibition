@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\UnityProject\Assets\Scripts\AnimalCatalog.cs" Link="AnimalCatalog.cs" />
+    <Compile Include="..\UnityProject\Assets\Scripts\ColoringRigDefinition.cs" Link="ColoringRigDefinition.cs" />
+    <Compile Include="..\UnityProject\Assets\Scripts\InteractionGestures.cs" Link="InteractionGestures.cs" />
+    <Compile Include="..\UnityProject\Assets\Scripts\AnimalCompanions.cs" Link="AnimalCompanions.cs" />
+    <Compile Include="..\UnityProject\Assets\Scripts\MagicLibrary.cs" Link="MagicLibrary.cs" />
+    <Compile Include="..\UnityProject\Assets\Scripts\ShadowContact.cs" Link="ShadowContact.cs" />
+    <Compile Include="..\UnityProject\Assets\Scripts\ResonanceField.cs" Link="ResonanceField.cs" />
+    <Compile Include="..\UnityProject\Assets\Scripts\SpringEnvironmentWorld.cs" Link="SpringEnvironmentWorld.cs" />
+    <None Include="..\UnityProject\Assets\Resources\ColoringRigs\CatV2\Body.bytes"
+          Link="TestData\Body.bytes" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
