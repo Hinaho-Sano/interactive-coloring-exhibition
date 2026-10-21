@@ -3,7 +3,9 @@
 Azure KinectとUnityでつくる、手のひらで額絵に触れるインタラクティブ展示です。
 明るく飾られた動物の絵に触れると、フクロウやキツネが額縁から出て、手でなぞった道を追いかけます。
 
-![展示の背景](preview.png)
+### 体験デモ動画
+
+https://github.com/user-attachments/assets/35db96d3-4e8c-4854-ab03-62b0d04d5061
 
 ## 体験
 
